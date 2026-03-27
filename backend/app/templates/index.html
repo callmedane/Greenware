@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Team 2 | Greenware Inspection System</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <!-- ============================================ -->
+  <!-- APP SHELL -->
+  <!-- ============================================ -->
+  <div class="app-shell">
+    
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="sidebar glass">
+      <div class="brand-section">
+        <div class="team-badge">
+          <span class="badge-number">2</span>
+        </div>
+        <div class="brand-text">
+          <h1>Team 2</h1>
+          <p class="brand-subtitle">Greenware Inspection</p>
+        </div>
+      </div>
+
+      <nav class="main-nav">
+        <ul class="nav-list">
+          <li><a href="#dashboard" class="nav-link active" data-section="dashboard">
+            <span class="nav-icon">📊</span>
+            <span>Dashboard</span>
+          </a></li>
+          <li><a href="#detection" class="nav-link" data-section="detection">
+            <span class="nav-icon">🔍</span>
+            <span>Detection</span>
+          </a></li>
+          <li><a href="#reports" class="nav-link" data-section="reports">
+            <span class="nav-icon">📋</span>
+            <span>Reports</span>
+          </a></li>
+          <li><a href="#settings" class="nav-link" data-section="settings">
+            <span class="nav-icon">⚙️</span>
+            <span>Settings</span>
+          </a></li>
+          <li><a href="#contact" class="nav-link" data-section="contact">
+            <span class="nav-icon">✉️</span>
+            <span>Contact</span>
+          </a></li>
+          <li><a href="#developers" class="nav-link" data-section="developers">
+            <span class="nav-icon">👥</span>
+            <span>Developers</span>
+          </a></li>
+        </ul>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="system-status-mini">
+          <span class="status-label">System</span>
+          <span class="status-badge idle" id="sidebarStatus">IDLE</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="content-area">
+      <!-- HEADER with Branding -->
+      <header class="app-header glass">
+        <div class="header-content">
+          <div class="header-title">
+            <h2>Team 2 | Greenware Inspection System</h2>
+            <p class="header-subtitle">Design of a Multimodal Sensor Fusion System for Surface and Subsurface Defect Detection and Material Classification with Digital Twin Visualization of Greenware Clay</p>
+          </div>
+        </div>
+      </header>
+
+      <!-- ======================================== -->
+      <!-- SECTION 1: DASHBOARD -->
+      <!-- ======================================== -->
+      <section id="dashboard" class="page-section active">
+        <div class="section-header">
+          <h3>Inspection Overview</h3>
+          <p>Surface and subsurface defect review for greenware clay</p>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="quick-stats">
+          <div class="stat-card">
+            <span class="stat-label">System Status</span>
+            <span class="stat-value" id="overallStatus">IDLE</span>
+            <span class="status-indicator idle" id="statusIndicator"></span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Debris Found</span>
+            <span class="stat-value" id="debrisCount">0</span>
+            <span class="stat-context">particles</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Moisture Level</span>
+            <span class="stat-value" id="moistureValue">--</span>
+            <span class="stat-context">%</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Drying Time</span>
+            <span class="stat-value" id="dryingValue">--</span>
+            <span class="stat-context">hours</span>
+          </div>
+        </div>
+
+        <!-- Main Metrics -->
+        <div class="metrics-row">
+          <article class="metric-card glass">
+            <span class="mini-label">Surface Findings</span>
+            <strong id="surfaceCount">0</strong>
+            <span class="metric-hint">Visible defects</span>
+          </article>
+          <article class="metric-card glass">
+            <span class="mini-label">Subsurface Findings</span>
+            <strong id="subsurfaceCount">0</strong>
+            <span class="metric-hint">Internal defects</span>
+          </article>
+          <article class="metric-card glass">
+            <span class="mini-label">Highest Confidence</span>
+            <strong id="highestConfidence">--</strong>
+            <span class="metric-hint">Detection accuracy</span>
+          </article>
+          <article class="metric-card glass">
+            <span class="mini-label">Decision</span>
+            <strong id="decisionLabel">Awaiting Scan</strong>
+            <span class="metric-hint">Recommendation</span>
+          </article>
+        </div>
+
+        <!-- Defect Map and 3D Viewer Grid -->
+        <div class="main-grid">
+          <section class="card glass tall-card">
+            <div class="section-title-row">
+              <h4>2D Defect Map</h4>
+              <span class="badge">Top View</span>
+            </div>
+            <canvas id="mapCanvas" width="560" height="360"></canvas>
+            <div class="legend-row">
+              <span><i class="dot surface"></i>Surface</span>
+              <span><i class="dot subsurface"></i>Subsurface</span>
+            </div>
+          </section>
+
+          <section class="card glass tall-card">
+            <div class="section-title-row">
+              <h4>3D Clay View</h4>
+              <span class="badge">Interactive</span>
+            </div>
+            <div id="clayViewer" class="clay-viewer">
+              <div id="clayShape" class="clay-shape">
+                <div class="clay-rim"></div>
+                <div class="clay-body"></div>
+              </div>
+              <div id="viewerMarkers" class="viewer-markers"></div>
+            </div>
+            <div class="viewer-controls">
+              <label>Rotate
+                <input id="rotationSlider" type="range" min="-45" max="45" value="0" />
+              </label>
+              <label>Tilt
+                <input id="tiltSlider" type="range" min="-20" max="20" value="0" />
+              </label>
+            </div>
+          </section>
+        </div>
+
+        <!-- Sensor and History -->
+        <div class="bottom-grid">
+          <section class="card glass">
+            <div class="section-title-row">
+              <h4>Sensor Snapshot</h4>
+              <span class="badge">Live Data</span>
+            </div>
+            <div class="sensor-grid" id="sensorGrid"></div>
+          </section>
+
+          <section class="card glass">
+            <div class="section-title-row">
+              <h4>Recommendation</h4>
+              <span class="badge">Action</span>
+            </div>
+            <p id="recommendation" class="recommendation-text">No scan yet.</p>
+          </section>
+        </div>
+
+        <section class="card glass">
+          <div class="section-title-row">
+            <h4>Inspection History</h4>
+            <span class="badge">Recent</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Scan ID</th><th>Status</th><th>Debris</th><th>Time</th></tr>
+              </thead>
+              <tbody id="historyBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+          <button id="scanBtn" class="btn btn-primary">Start Scan</button>
+          <button id="refreshBtn" class="btn btn-secondary">Refresh Data</button>
+        </div>
+      </section>
+
+      <!-- ======================================== -->
+      <!-- SECTION 2: DETECTION -->
+      <!-- ======================================== -->
+      <section id="detection" class="page-section">
+        <div class="section-header">
+          <h3>Advanced Detection</h3>
+          <p>Direct access to sensor fusion and defect detection tools</p>
+        </div>
+
+        <div class="detection-grid">
+          <section class="card glass">
+            <h4>Latest Defects</h4>
+            <ul id="defectList" class="clean-list"></ul>
+          </section>
+
+          <section class="card glass">
+            <h4>Detection Parameters</h4>
+            <div class="param-list">
+              <div class="param-item">
+                <label>Confidence Threshold</label>
+                <input type="range" id="confThreshold" min="0" max="100" value="70" class="param-slider" />
+                <span id="confValue">70%</span>
+              </div>
+              <div class="param-item">
+                <label>Sensor Mode</label>
+                <select id="sensorMode" class="param-select">
+                  <option>All Sensors</option>
+                  <option>Thermal Only</option>
+                  <option>Acoustic Only</option>
+                  <option>Visual Only</option>
+                </select>
+              </div>
+              <div class="param-item">
+                <label>Depth Analysis</label>
+                <select id="depthAnalysis" class="param-select">
+                  <option>Both</option>
+                  <option>Surface Only</option>
+                  <option>Subsurface Only</option>
+                </select>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <section class="card glass">
+          <h4>Detection Log</h4>
+          <div class="log-viewer" id="detectionLog">
+            <div class="log-entry">Waiting for detection data...</div>
+          </div>
+        </section>
+      </section>
+
+      <!-- ======================================== -->
+      <!-- SECTION 3: REPORTS -->
+      <!-- ======================================== -->
+      <section id="reports" class="page-section">
+        <div class="section-header">
+          <h3>Reports & Analytics</h3>
+          <p>Historical trends and detailed inspection reports</p>
+        </div>
+
+        <div class="reports-grid">
+          <section class="card glass">
+            <h4>Summary Statistics</h4>
+            <div class="stat-grid">
+              <div class="stat-box">
+                <span class="stat-box-label">Total Scans</span>
+                <span class="stat-box-value" id="totalScans">0</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-box-label">Pass Rate</span>
+                <span class="stat-box-value" id="passRate">--%</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-box-label">Avg Defects</span>
+                <span class="stat-box-value" id="avgDefects">--</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-box-label">System Uptime</span>
+                <span class="stat-box-value" id="uptime">--</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="card glass">
+            <h4>Export & Download</h4>
+            <div class="export-buttons">
+              <button class="btn btn-secondary">Export CSV</button>
+              <button class="btn btn-secondary">Export PDF</button>
+              <button class="btn btn-secondary">Download Images</button>
+            </div>
+          </section>
+        </div>
+
+        <section class="card glass">
+          <h4>Detailed History</h4>
+          <div class="history-table-wrap">
+            <table class="history-table">
+              <thead>
+                <tr>
+                  <th>Scan ID</th>
+                  <th>Date & Time</th>
+                  <th>Status</th>
+                  <th>Surface Defects</th>
+                  <th>Subsurface Defects</th>
+                  <th>Debris Count</th>
+                  <th>Confidence</th>
+                </tr>
+              </thead>
+              <tbody id="reportHistoryBody">
+                <tr><td colspan="7" class="empty-state">No scan data available</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <!-- ======================================== -->
+      <!-- SECTION 4: SETTINGS -->
+      <!-- ======================================== -->
+      <section id="settings" class="page-section">
+        <div class="section-header">
+          <h3>Settings & Configuration</h3>
+          <p>Customize your inspection system experience</p>
+        </div>
+
+        <div class="settings-grid">
+          <!-- Display Settings -->
+          <section class="card glass">
+            <h4>Display Settings</h4>
+            <div class="settings-group">
+              <div class="setting-item">
+                <label for="themeSelect">Theme</label>
+                <select id="themeSelect" class="setting-control">
+                  <option value="light">Light (Earthy)</option>
+                  <option value="dark">Dark Mode</option>
+                  <option value="warm">Warm (Default)</option>
+                  <option value="minimal">Minimal</option>
+                </select>
+              </div>
+
+              <div class="setting-item">
+                <label for="fontSizeSelect">Font Size</label>
+                <select id="fontSizeSelect" class="setting-control">
+                  <option value="small">Small</option>
+                  <option value="medium" selected>Medium (Default)</option>
+                  <option value="large">Large</option>
+                  <option value="xlarge">Extra Large</option>
+                </select>
+              </div>
+
+              <div class="setting-item">
+                <label for="contrastToggle">High Contrast</label>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="contrastToggle" />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+          </section>
+
+          <!-- Detection Settings -->
+          <section class="card glass">
+            <h4>Detection Settings</h4>
+            <div class="settings-group">
+              <div class="setting-item">
+                <label for="confidenceThreshold">Detection Confidence Threshold</label>
+                <div class="slider-group">
+                  <input type="range" id="confidenceThreshold" min="0" max="100" value="70" class="setting-slider" />
+                  <span id="confidenceValue" class="slider-value">70%</span>
+                </div>
+              </div>
+
+              <div class="setting-item">
+                <label for="autoRefreshToggle">Auto-Refresh</label>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="autoRefreshToggle" />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+              <div class="setting-item">
+                <label for="refreshInterval">Refresh Interval</label>
+                <select id="refreshInterval" class="setting-control">
+                  <option value="5">Every 5 seconds</option>
+                  <option value="10">Every 10 seconds</option>
+                  <option value="30">Every 30 seconds</option>
+                  <option value="60">Every 1 minute</option>
+                </select>
+              </div>
+            </div>
+          </section>
+
+          <!-- Notification Settings -->
+          <section class="card glass">
+            <h4>Notifications</h4>
+            <div class="settings-group">
+              <div class="setting-item">
+                <label for="notificationsToggle">Enable Notifications</label>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="notificationsToggle" checked />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+              <div class="setting-item">
+                <label for="soundToggle">Sound Alerts</label>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="soundToggle" />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+              <div class="setting-item">
+                <label for="defectAlertToggle">Alert on Defects</label>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="defectAlertToggle" checked />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+          </section>
+
+          <!-- System Settings -->
+          <section class="card glass">
+            <h4>System</h4>
+            <div class="settings-group">
+              <div class="setting-item">
+                <label>System Status</label>
+                <p class="system-info">Raspberry Pi • Online • Last Sync: <span id="lastSyncTime">--</span></p>
+              </div>
+
+              <div class="setting-item">
+                <label>Data Storage</label>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: 65%;"></div>
+                </div>
+                <p class="storage-info">6.5 GB / 10 GB used</p>
+              </div>
+
+              <div class="setting-item">
+                <button class="btn btn-secondary">Clear Cache</button>
+                <button class="btn btn-secondary">Reset Settings</button>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- Save Settings -->
+        <div class="settings-actions">
+          <button id="saveSettingsBtn" class="btn btn-primary">Save Settings</button>
+          <button id="resetSettingsBtn" class="btn btn-secondary">Reset to Default</button>
+        </div>
+      </section>
+
+      <!-- ======================================== -->
+      <!-- SECTION 5: CONTACT -->
+      <!-- ======================================== -->
+      <section id="contact" class="page-section">
+        <div class="section-header">
+          <h3>Contact Information</h3>
+          <p>Get in touch with Team 2</p>
+        </div>
+
+        <div class="contact-grid">
+          <!-- Contact Information -->
+          <section class="card glass">
+            <h4>Team 2 - Greenware Inspection System</h4>
+            <div class="contact-info">
+              <div class="contact-item">
+                <strong>Project Title</strong>
+                <p>Design of a Multimodal Sensor Fusion System for Surface and Subsurface Defect Detection and Material Classification with Digital Twin Visualization of Greenware Clay</p>
+              </div>
+
+              <div class="contact-item">
+                <strong>Email</strong>
+                <p><a href="mailto:team2@greenware.local">team2@greenware.local</a></p>
+              </div>
+
+              <div class="contact-item">
+                <strong>Location</strong>
+                <p>University Ceramics & Materials Lab<br />Research Wing, Building C</p>
+              </div>
+
+              <div class="contact-item">
+                <strong>Availability</strong>
+                <p>Monday - Friday: 9:00 AM - 5:00 PM<br />Weekend support by appointment</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Contact Form -->
+          <section class="card glass">
+            <h4>Send us a Message</h4>
+            <form id="contactForm" class="contact-form">
+              <div class="form-group">
+                <label for="contactName">Full Name *</label>
+                <input type="text" id="contactName" name="name" required />
+              </div>
+
+              <div class="form-group">
+                <label for="contactEmail">Email Address *</label>
+                <input type="email" id="contactEmail" name="email" required />
+              </div>
+
+              <div class="form-group">
+                <label for="contactSubject">Subject *</label>
+                <input type="text" id="contactSubject" name="subject" required />
+              </div>
+
+              <div class="form-group">
+                <label for="contactMessage">Message *</label>
+                <textarea id="contactMessage" name="message" rows="5" required></textarea>
+              </div>
+
+              <button type="submit" class="btn btn-primary">Send Message</button>
+              <p class="form-note">We'll respond to your message within 24 hours.</p>
+            </form>
+          </section>
+        </div>
+      </section>
+
+      <!-- ======================================== -->
+      <!-- SECTION 6: DEVELOPERS -->
+      <!-- ======================================== -->
+      <section id="developers" class="page-section">
+        <div class="section-header">
+          <h3>Development Team</h3>
+          <p>Meet the team behind the Greenware Inspection System</p>
+        </div>
+
+        <div class="developers-grid">
+          <!-- Developer Card 1 -->
+          <article class="developer-card glass">
+            <div class="dev-image">
+              <img src="/static/ronel.png" alt="Developer photo" />
+            </div>
+            <div class="dev-content">
+              <h4 class="dev-name">Castillo, Ronel Christan</h4>
+              <p class="dev-email"><a href="qrcvcastillo@tip.edu.ph">qrcvcastillo@tip.edu.ph</a></p>
+              <p class="dev-track">Data Science</p>
+              <p class="dev-contribution">System architecture, sensor fusion algorithms, clay material database</p>
+            </div>
+          </article>
+
+          <!-- Developer Card 2 -->
+          <article class="developer-card glass">
+            <div class="dev-image">
+              <img src="/static/gerome.png" alt="Developer photo" />
+            </div>
+            <div class="dev-content">
+              <h4 class="dev-name">Fernandez, Gerome Dave</h4>
+              <p class="dev-email"><a href="qgdlfernandez@tip.edu.ph">qgdlfernandez@tip.edu.ph</a></p>
+              <p class="dev-track">Cyber-Physical Systems</p>
+              <p class="dev-contribution">API development, Raspberry Pi integration, data pipeline</p>
+            </div>
+          </article>
+
+          <!-- Developer Card 3 -->
+          <article class="developer-card glass">
+            <div class="dev-image">
+              <img src="/static/maynard.png" alt="Developer photo" />
+            </div>
+            <div class="dev-content">
+              <h4 class="dev-name">Refugia, Maynard</h4>
+              <p class="dev-email"><a href="qmrefugia@tip.edu.ph">qmrefugia@tip.edu.ph</a></p>
+              <p class="dev-track">Cyber-Physical Systems</p>
+              <p class="dev-contribution">Dashboard interface, data visualization, user experience design</p>
+            </div>
+          </article>
+
+          <!-- Developer Card 4 -->
+          <article class="developer-card glass">
+            <div class="dev-image">
+              <img src="/static/dane.png" alt="Developer photo" />
+            </div>
+            <div class="dev-content">
+              <h4 class="dev-name">Sembrero, Christian Dane </h4>
+              <p class="dev-email"><a href="qcddsembrero@tip.edu.ph">qcddsembrero@tip.edu.ph</a></p>
+              <p class="dev-track">System Administration</p>
+              <p class="dev-contribution">Defect detection model, classification algorithms, performance optimization</p>
+            </div>
+          </article>
+
+          <!-- Developer Card 5 -->
+          <article class="developer-card glass">
+            <div class="dev-image">
+              <img src="/static/ralph.png" alt="Developer photo" />
+            </div>
+            <div class="dev-content">
+              <h4 class="dev-name">Uy, Ralph Khristian</h4>
+              <p class="dev-email"><a href="qrk-uy@tip.edu.ph">qrk-uy@tip.edu.ph</a></p>
+              <p class="dev-track">Cyber-Physical Systems</p>
+              <p class="dev-contribution">Sensor calibration, thermal imaging, acoustic sensor integration</p>
+            </div>
+          </article>
+        </div>
+
+        <!-- Footer Info -->
+        <section class="card glass team-info">
+          <h4>About Team 2</h4>
+          <p>Team 2 is dedicated to developing innovative solutions for quality control in pottery and ceramics manufacturing. Our multimodal sensor fusion system combines thermal imaging, acoustic analysis, and computer vision to detect surface and subsurface defects in greenware clay with unprecedented accuracy.</p>
+          <p>We work closely with local artisans, pottery workshops, and industrial manufacturers to ensure our technology respects traditional craft practices while delivering modern quality assurance capabilities.</p>
+        </section>
+      </section>
+
+      <!-- FOOTER -->
+      <footer class="app-footer">
+        <div class="footer-content">
+          <p>&copy; 2024 Team 2 | Greenware Inspection System</p>
+          <p>Design of a Multimodal Sensor Fusion System for Surface and Subsurface Defect Detection</p>
+        </div>
+      </footer>
+
+    </main>
+  </div>
+</body>
+</html>
